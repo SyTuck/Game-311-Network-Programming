@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
 				}
 				if (!server)
 				{
-					char clientSend[4] = { '1', '2', '3', '4' };								//initialize transmit data (all keys released, no user command, last byte don't care)
+					char clientSend[4] = { 0, 0, 0xff, 0xff };								//initialize transmit data (all keys released, no user command, last byte don't care)
 					if (EventHandler::events[W_PRESSED])									//Send the keystates, with a filter for simultaneous key presses (W overrides S)
 					{
 						clientSend[0] = -1;
@@ -182,6 +182,7 @@ int main(int argc, char *argv[])
 				//std::cout << DataFromOpponent;
 				if (server)																					//if we're the server, get the second player keypresses from the network
 				{
+				->	having trouble pulling the values out of recieve bugger here
 					EventHandler::events[UP_PRESSED] = (bool)*DataFromOpponent;
 
 					if (EventHandler::events[UP_PRESSED])
