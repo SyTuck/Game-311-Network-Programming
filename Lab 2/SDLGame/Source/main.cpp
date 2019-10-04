@@ -19,7 +19,8 @@
 
 struct ServerDataStruct
 {
-	unsigned short ballPos;
+	unsigned short ballXPos;
+	unsigned short ballYPos;
 	unsigned short paddle0Pos;
 	unsigned short paddle1Pos;
 	unsigned char  score;
@@ -156,14 +157,14 @@ int main(int argc, char *argv[])
 				}
 				if (!server)
 				{
-					char clientSend[4] = { 0, 0, 0xff, 0xff };								//initialize transmit data (all keys released, no user command, last byte don't care)
+					char clientSend[5] = { 'F', 'F', 0xff, 0xff, '/n' };					//initialize transmit data (all keys released, no user command, last byte don't care)
 					if (EventHandler::events[W_PRESSED])									//Send the keystates, with a filter for simultaneous key presses (W overrides S)
 					{
-						clientSend[0] = -1;
+						clientSend[0] = 'T';
 					}
 					else if (EventHandler::events[S_PRESSED] == true)
 					{
-						clientSend[1] = -1;
+						clientSend[1] = 'T';
 					}
 					//NetworkManager::GetInstance()->SendData("Hello from client world");
 					NetworkManager::GetInstance()->SendData(clientSend);
@@ -173,7 +174,6 @@ int main(int argc, char *argv[])
 
 		Paddles[0].Update();
 
-
 		if (networked)
 		{
 			char *DataFromOpponent = NetworkManager::GetInstance()->ReceiveData();							//Receive keypresses from the client
@@ -182,18 +182,39 @@ int main(int argc, char *argv[])
 				//std::cout << DataFromOpponent;
 				if (server)																					//if we're the server, get the second player keypresses from the network
 				{
-				->	having trouble pulling the values out of recieve bugger here
-					EventHandler::events[UP_PRESSED] = (bool)*DataFromOpponent;
+				//->	having trouble pulling the values out of recieve bug here
+				//	EventHandler::events[UP_PRESSED] = (bool)*DataFromOpponent;
+					EventHandler::events[UP_PRESSED] = false;
+					EventHandler::events[DOWN_PRESSED] = false;
 
-					if (EventHandler::events[UP_PRESSED])
+//					if (EventHandler::events[UP_PRESSED])
+					if (*DataFromOpponent == 'T')
 					{
-						EventHandler::events[DOWN_PRESSED] = false;
+						EventHandler::events[UP_PRESSED] = true;
 					}
-					else
+					else if (*(DataFromOpponent + 1) == 'T')
 					{
-						EventHandler::events[DOWN_PRESSED] = (bool)*(DataFromOpponent + 1);
+						//EventHandler::events[DOWN_PRESSED] = (bool)*(DataFromOpponent + 1);
+						EventHandler::events[DOWN_PRESSED] = true;
 					}
 					Paddles[1].Update();
+				}
+				else
+				{	
+					unsigned short *tmpPnt = (unsigned short *) DataFromOpponent;
+					*tmpPnt = ntohs(*tmpPnt);
+//					unsigned short tmpDat = ntohs(*tmpPnt);
+					float localBall = float (WINDOW_WIDTH - *tmpPnt);									//flip the server's ball so it's relevant to the local view
+					Ball.SetXPosition(localBall);
+					tmpPnt++;
+					*tmpPnt = ntohs(*tmpPnt);
+					Ball.SetYPosition(float(*tmpPnt++));
+					tmpPnt++;
+					*tmpPnt = ntohs(*tmpPnt);
+					Paddles[1].SetYPosition(float(*tmpPnt++));											//also flip paddle locations 
+					tmpPnt++;
+					*tmpPnt = ntohs(*tmpPnt);
+					Paddles[0].SetYPosition(float(*tmpPnt++));											//(server is on the right side, client/local is on the left side)
 				}
 			}
 		}
@@ -202,24 +223,32 @@ int main(int argc, char *argv[])
 			Paddles[1].Update();
 		}
 
-		Ball.Update();
-		Ball.CheckWallCollision();
-		Ball.CheckGOCollision(Paddles[0]);
-		Ball.CheckGOCollision(Paddles[1]);
+		if ((!networked) || (server))													//only check for collisions if we're the server or standalone
+		{																				
+			Ball.Update();
+			Ball.CheckWallCollision();
+			Ball.CheckGOCollision(Paddles[0]);
+			Ball.CheckGOCollision(Paddles[1]);
+		}
 
 		if (networked)
 		{
-/*			if (server)
+			if (server)
 			{
-				NetworkManager::GetInstance()->SendData("Hello from Server world");
+				serverData.ballXPos = htons(Ball.GetTransform().position.x);
+				serverData.ballYPos = htons(Ball.GetTransform().position.y);
+				serverData.paddle0Pos = htons(Paddles[0].GetTransform().position.y);
+				serverData.paddle1Pos = htons(Paddles[1].GetTransform().position.y);
+				serverData.score = 0;
+				serverData.gameState = 0;
 
-
+				NetworkManager::GetInstance()->SendData(reinterpret_cast<char *>(&serverData));
 			}
-			else
-			{
-				NetworkManager::GetInstance()->SendData("Hello from client world");
-			}
-*/		}
+//			else
+//			{
+//				NetworkManager::GetInstance()->SendData("Hello from client world");
+//			}
+		}
 		// update the drawn paddles
 		Paddles[0].Draw(window, renderer);
 		Paddles[1].Draw(window, renderer);

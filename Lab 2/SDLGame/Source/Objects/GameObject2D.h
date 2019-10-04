@@ -37,6 +37,8 @@ public:
 
 	Transform2D GetTransform() { return transform; }
 	SDL_Point GetDimensions() { return Dimensions; }
+	void SetYPosition(float ypos) { transform.position.y = ypos; }			//direct access for position to put server in charge of the client's ball (and opponent paddle)
+	void SetXPosition(float xpos) { transform.position.x = xpos; }
 
 protected:
 	// pos, rot, scale
