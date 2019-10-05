@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
 				}
 				if (!server)
 				{
-					char clientSend[5] = { 'F', 'F', 0xff, 0xff, '/n' };					//initialize transmit data (all keys released, no user command, last byte don't care)
+					char clientSend[5] = { 'F', 'F', ' ', ' ', '/n' };					//initialize transmit data (all keys released, no user command, last byte don't care)
 					if (EventHandler::events[W_PRESSED])									//Send the keystates, with a filter for simultaneous key presses (W overrides S)
 					{
 						clientSend[0] = 'T';
@@ -166,7 +166,6 @@ int main(int argc, char *argv[])
 					{
 						clientSend[1] = 'T';
 					}
-					//NetworkManager::GetInstance()->SendData("Hello from client world");
 					NetworkManager::GetInstance()->SendData(clientSend);
 				}
 			}
@@ -199,22 +198,38 @@ int main(int argc, char *argv[])
 					}
 					Paddles[1].Update();
 				}
-				else
+				else 
 				{	
-					unsigned short *tmpPnt = (unsigned short *) DataFromOpponent;
+					//unsigned short *tmpPnt = (unsigned short *) DataFromOpponent;
+					//unsigned short* tmpPnt = reinterpret_cast<unsigned short*>(DataFromOpponent);
+
+					unsigned char* muffit = reinterpret_cast<unsigned char*>(DataFromOpponent);
+					for (int x = 0; x < 10; x++)
+					{
+						*muffit -= 1;
+						muffit++;
+					}
+					unsigned short* tmpPnt = reinterpret_cast<unsigned short*>(muffit);
+
 					*tmpPnt = ntohs(*tmpPnt);
 //					unsigned short tmpDat = ntohs(*tmpPnt);
-					float localBall = float (WINDOW_WIDTH - *tmpPnt);									//flip the server's ball so it's relevant to the local view
-					Ball.SetXPosition(localBall);
+					float localDat = float (WINDOW_WIDTH - *tmpPnt);									//flip the server's ball so it's relevant to the local view
+					Ball.SetXPosition(localDat);
 					tmpPnt++;
+					localDat = float (*tmpPnt);
 					*tmpPnt = ntohs(*tmpPnt);
-					Ball.SetYPosition(float(*tmpPnt++));
+					localDat = float(*tmpPnt);
+					Ball.SetYPosition(localDat); // float(*tmpPnt));
 					tmpPnt++;
+					localDat = float(*tmpPnt);
 					*tmpPnt = ntohs(*tmpPnt);
-					Paddles[1].SetYPosition(float(*tmpPnt++));											//also flip paddle locations 
+					localDat = float(*tmpPnt);
+					Paddles[1].SetYPosition(localDat); // float(*tmpPnt));											//also flip paddle locations 
 					tmpPnt++;
+					localDat = float(*tmpPnt);
 					*tmpPnt = ntohs(*tmpPnt);
-					Paddles[0].SetYPosition(float(*tmpPnt++));											//(server is on the right side, client/local is on the left side)
+					localDat = float(*tmpPnt);
+					Paddles[0].SetYPosition(localDat); // float(*tmpPnt));											//(server is on the right side, client/local is on the left side)
 				}
 			}
 		}
@@ -235,13 +250,19 @@ int main(int argc, char *argv[])
 		{
 			if (server)
 			{
-				serverData.ballXPos = htons(Ball.GetTransform().position.x);
-				serverData.ballYPos = htons(Ball.GetTransform().position.y);
-				serverData.paddle0Pos = htons(Paddles[0].GetTransform().position.y);
-				serverData.paddle1Pos = htons(Paddles[1].GetTransform().position.y);
+				serverData.ballXPos = htons(unsigned short (Ball.GetTransform().position.x));
+				serverData.ballYPos = htons(unsigned short(Ball.GetTransform().position.y));
+				serverData.paddle0Pos = htons(unsigned short(Paddles[0].GetTransform().position.y));
+				serverData.paddle1Pos = htons(unsigned short(Paddles[1].GetTransform().position.y));
 				serverData.score = 0;
 				serverData.gameState = 0;
 
+				unsigned char* muffit = reinterpret_cast<unsigned char*>(&serverData);
+				for (int x = 0; x < 10; x++)
+				{
+					*muffit += 1;
+					muffit++;					
+				}
 				NetworkManager::GetInstance()->SendData(reinterpret_cast<char *>(&serverData));
 			}
 //			else
@@ -289,5 +310,5 @@ void DisplaySplashScreen(SDL_Window* mainWindow, SDL_Renderer* mainRenderer)
 	SDL_RenderPresent(mainRenderer);
 
 	// pause to control framerate
-	SDL_Delay(1500);
+	SDL_Delay(15);
 }

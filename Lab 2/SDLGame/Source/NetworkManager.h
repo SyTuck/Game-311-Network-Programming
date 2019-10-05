@@ -9,8 +9,9 @@
 //#define DEFAULTSERVERIP "10.105.11.53"			//3rd comp
 //#define SERVERIP "10.105.11.53"			//Alex
 //#define SERVERIP "10.105.10.38"			//J lab 2nd comp
-#define DEFAULTSERVERIP "10.105.10.34"				//J lab Amel
+//#define DEFAULTSERVERIP "10.105.10.34"				//J lab Amel
 //#define SERVERIP "10.105.11.56"			//Amel
+#define DEFAULTSERVERIP "192.168.0.21"		//home sever
 #define CLIENTIP "10.105.11.49"				//main comp
 #define DEFAULTGAMEPORT 8890
 
@@ -56,7 +57,7 @@ private:
 	//singleton instance
 	static NetworkManager* instance;
 
-	const int MAX_MESSAGE_SIZE = 1300;
+	const int MAX_MESSAGE_SIZE = 100;
 
 };
 
