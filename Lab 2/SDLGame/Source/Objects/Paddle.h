@@ -9,8 +9,6 @@ public:
 	~Paddle();
 
 	void Update();
-	void ForcePaddleKey();
-
 	void SetPlayerNumber(int number); 
 
 	int playerNumber = 1;

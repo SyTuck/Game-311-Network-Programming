@@ -19,12 +19,14 @@
 
 struct ServerDataStruct
 {
+	char header[2] = { 'a', 'A' };			//header and footer two bytes long to make sure there's no padding issues
 	unsigned short ballXPos;
 	unsigned short ballYPos;
 	unsigned short paddle0Pos;
 	unsigned short paddle1Pos;
 	unsigned char  score;
 	unsigned char  gameState;
+	char footer[2] = { 'z', 'Z' };
 } serverData;
 
 struct ClientData
@@ -122,14 +124,11 @@ int main(int argc, char *argv[])
 		{
 			NetworkManager::GetInstance()->AcceptConnections();
 		}
-
 		else
 		{
 			NetworkManager::GetInstance()->ConnectSockets();
 		}
 	}
-
-
 
 	// Main game loop
 	while (GameRunning)
@@ -143,9 +142,9 @@ int main(int argc, char *argv[])
 
 		if (networked)																		//if running networked, remap all keys to player 0
 		{																					//so everyone plays from only one side of the screen
-			if (EventHandler::newEvent)
-			{
-				if (EventHandler::events[UP_PRESSED])
+			if (EventHandler::newEvent)														//"update" flag added to the event handle to only send data when something has changed
+			{																				//(removing this if and the "listenSocket" to "peersocket" change in AcceptConnections )
+				if (EventHandler::events[UP_PRESSED])										//(might fix the receiving continously bad data issue?                                 )
 				{
 					EventHandler::events[W_PRESSED] = true;
 					EventHandler::events[UP_PRESSED] = false;
@@ -157,7 +156,7 @@ int main(int argc, char *argv[])
 				}
 				if (!server)
 				{
-					char clientSend[5] = { 'F', 'F', ' ', ' ', '/n' };					//initialize transmit data (all keys released, no user command, last byte don't care)
+					char clientSend[5] = { 'F', 'F', ' ', ' ', '\n' };						//initialize transmit data (all keys released, no user command, last bytes don't care for now)
 					if (EventHandler::events[W_PRESSED])									//Send the keystates, with a filter for simultaneous key presses (W overrides S)
 					{
 						clientSend[0] = 'T';
@@ -171,74 +170,52 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		Paddles[0].Update();
+		Paddles[0].Update();																//local/left paddle is always updated from key controls regardless of game mode	
 
 		if (networked)
 		{
-			char *DataFromOpponent = NetworkManager::GetInstance()->ReceiveData();							//Receive keypresses from the client
+			char *DataFromOpponent = NetworkManager::GetInstance()->ReceiveData();			//Receive keypresses from the client
 			if (&DataFromOpponent != 0)
 			{
-				//std::cout << DataFromOpponent;
-				if (server)																					//if we're the server, get the second player keypresses from the network
+				if (server)																	//if we're the server, get the second player keypresses from the network
 				{
-				//->	having trouble pulling the values out of recieve bug here
-				//	EventHandler::events[UP_PRESSED] = (bool)*DataFromOpponent;
 					EventHandler::events[UP_PRESSED] = false;
 					EventHandler::events[DOWN_PRESSED] = false;
 
-//					if (EventHandler::events[UP_PRESSED])
 					if (*DataFromOpponent == 'T')
 					{
 						EventHandler::events[UP_PRESSED] = true;
 					}
 					else if (*(DataFromOpponent + 1) == 'T')
 					{
-						//EventHandler::events[DOWN_PRESSED] = (bool)*(DataFromOpponent + 1);
 						EventHandler::events[DOWN_PRESSED] = true;
 					}
-					Paddles[1].Update();
+					Paddles[1].Update();																	
 				}
 				else 
 				{	
-					//unsigned short *tmpPnt = (unsigned short *) DataFromOpponent;
-					//unsigned short* tmpPnt = reinterpret_cast<unsigned short*>(DataFromOpponent);
-
-					unsigned char* muffit = reinterpret_cast<unsigned char*>(DataFromOpponent);
-					for (int x = 0; x < 10; x++)
-					{
-						*muffit -= 1;
-						muffit++;
+					ServerDataStruct *tmpSrvDat;											//if we're the client, receive the paddle and ball position data
+					tmpSrvDat = reinterpret_cast<ServerDataStruct *>(DataFromOpponent);		//from the server 
+					if ((tmpSrvDat->header[0] == 'a') && (tmpSrvDat->footer[0] == 'z'))		//only process our data (no longer able to troubleshoot to see if this helps)
+					{																		//(I seem to receive continous bad data even when the server is not sending)
+						unsigned short tmpDat = ntohs(*(DataFromOpponent+2));				//This should be reworked to use tmpSrvDat but I can't troubleshoot any changes
+						Ball.SetXPosition(float(WINDOW_WIDTH - tmpDat));					//so I'm leaving it at the last known state
+						tmpDat = ntohs(*(DataFromOpponent + 4));							//(note that the direction of the ball is flipped for the reversed prespective of the client)
+						Ball.SetYPosition(float(tmpDat)); 
+						tmpDat = ntohs(*(DataFromOpponent + 6));
+						Paddles[1].SetYPosition(float(tmpDat)); 							//also flip paddle locations
+						tmpDat = ntohs(*(DataFromOpponent + 8));							//(opponent is on the right side, local player is on the left side)
+						Paddles[0].SetYPosition(float(tmpDat)); 											
 					}
-					unsigned short* tmpPnt = reinterpret_cast<unsigned short*>(muffit);
-
-					*tmpPnt = ntohs(*tmpPnt);
-//					unsigned short tmpDat = ntohs(*tmpPnt);
-					float localDat = float (WINDOW_WIDTH - *tmpPnt);									//flip the server's ball so it's relevant to the local view
-					Ball.SetXPosition(localDat);
-					tmpPnt++;
-					localDat = float (*tmpPnt);
-					*tmpPnt = ntohs(*tmpPnt);
-					localDat = float(*tmpPnt);
-					Ball.SetYPosition(localDat); // float(*tmpPnt));
-					tmpPnt++;
-					localDat = float(*tmpPnt);
-					*tmpPnt = ntohs(*tmpPnt);
-					localDat = float(*tmpPnt);
-					Paddles[1].SetYPosition(localDat); // float(*tmpPnt));											//also flip paddle locations 
-					tmpPnt++;
-					localDat = float(*tmpPnt);
-					*tmpPnt = ntohs(*tmpPnt);
-					localDat = float(*tmpPnt);
-					Paddles[0].SetYPosition(localDat); // float(*tmpPnt));											//(server is on the right side, client/local is on the left side)
 				}
 			}
 		}
 		else
-		{
+		{																					//non network games have a regular paddle update
 			Paddles[1].Update();
 		}
 
-		if ((!networked) || (server))													//only check for collisions if we're the server or standalone
+		if ((!networked) || (server))														//only check for collisions if we're the server or standalone
 		{																				
 			Ball.Update();
 			Ball.CheckWallCollision();
@@ -246,29 +223,20 @@ int main(int argc, char *argv[])
 			Ball.CheckGOCollision(Paddles[1]);
 		}
 
-		if (networked)
+		if (networked)																		//once all is processed, update the client with the new game data
 		{
 			if (server)
 			{
-				serverData.ballXPos = htons(unsigned short (Ball.GetTransform().position.x));
-				serverData.ballYPos = htons(unsigned short(Ball.GetTransform().position.y));
+				unsigned short tmpDat = unsigned short(Ball.GetTransform().position.x);		
+				serverData.ballXPos = htons(tmpDat);
+				tmpDat = unsigned short(Ball.GetTransform().position.y);
+				serverData.ballYPos = htons(tmpDat);
 				serverData.paddle0Pos = htons(unsigned short(Paddles[0].GetTransform().position.y));
 				serverData.paddle1Pos = htons(unsigned short(Paddles[1].GetTransform().position.y));
 				serverData.score = 0;
 				serverData.gameState = 0;
-
-				unsigned char* muffit = reinterpret_cast<unsigned char*>(&serverData);
-				for (int x = 0; x < 10; x++)
-				{
-					*muffit += 1;
-					muffit++;					
-				}
 				NetworkManager::GetInstance()->SendData(reinterpret_cast<char *>(&serverData));
 			}
-//			else
-//			{
-//				NetworkManager::GetInstance()->SendData("Hello from client world");
-//			}
 		}
 		// update the drawn paddles
 		Paddles[0].Draw(window, renderer);

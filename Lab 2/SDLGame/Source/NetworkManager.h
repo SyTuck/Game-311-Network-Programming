@@ -7,6 +7,7 @@
 
 //#define DEFAULTSERVERIP "10.105.11.46"			//2nd comp
 //#define DEFAULTSERVERIP "10.105.11.53"			//3rd comp
+//#define DEFAULTSERVERIP "10.105.11.37"			//3rd comp
 //#define SERVERIP "10.105.11.53"			//Alex
 //#define SERVERIP "10.105.10.38"			//J lab 2nd comp
 //#define DEFAULTSERVERIP "10.105.10.34"				//J lab Amel

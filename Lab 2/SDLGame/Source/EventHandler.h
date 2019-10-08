@@ -29,7 +29,7 @@ public:
 	static const int NUM_EVENTS = 10;
  
 	static bool events[PongEvents::NUM_PONG_EVENTS];
-	static bool newEvent;
+	static bool newEvent;									
 
 private:
 
