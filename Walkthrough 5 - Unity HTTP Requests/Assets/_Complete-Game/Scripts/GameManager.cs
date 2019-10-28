@@ -22,9 +22,9 @@ namespace Completed
 		private int level = 1;									//Current level number, expressed in game as "Day 1".
 		private List<Enemy> enemies;							//List of all Enemy units, used to issue them move commands.
 		private bool enemiesMoving;								//Boolean to check if enemies are moving.
-		private bool doingSetup = true;							//Boolean to check if we're setting up board, prevent Player from moving during setup.
-		
-		
+		private bool doingSetup = true;                         //Boolean to check if we're setting up board, prevent Player from moving during setup.
+
+        private string initials = " JVT";
 		
 		//Awake is always called before any Start functions
 		void Awake()
@@ -43,14 +43,17 @@ namespace Completed
 			
 			//Sets this to not be destroyed when reloading scene
 			DontDestroyOnLoad(gameObject);
-			
+
+            StartCoroutine(NetworkManager.Instance.PostRequestExample("http://149.248.56.133/SLCGame311/Login", initials));
+
 			//Assign enemies to a new List of Enemy objects.
 			enemies = new List<Enemy>();
 			
 			//Get a component reference to the attached BoardManager script
 			boardScript = GetComponent<BoardManager>();
-			
-			//Call the InitGame function to initialize the first level 
+
+            Random.InitState(1);
+            //Call the InitGame function to initialize the first level 
 			InitGame();
 		}
 
@@ -135,11 +138,12 @@ namespace Completed
 		//GameOver is called when the player reaches 0 food points
 		public void GameOver()
 		{
-			//Set levelText to display number of levels passed and game over message
-			levelText.text = "After " + level + " days, you starved.";
-			
-			//Enable black background image gameObject.
-			levelImage.SetActive(true);
+            //Set levelText to display number of levels passed and game over message
+            //levelText.text = "After " + level + " days, you starved.";
+            levelText.text = "After " + level + " days," + initials + " starved.";
+            StartCoroutine(NetworkManager.Instance.MakeGetRequest("http://149.248.56.133/SLCGame311/PlayerDied"));
+            //Enable black background image gameObject.
+            levelImage.SetActive(true);
 			
 			//Disable this GameManager.
 			enabled = false;
