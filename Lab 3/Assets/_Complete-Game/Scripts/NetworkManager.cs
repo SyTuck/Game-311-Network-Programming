@@ -118,16 +118,15 @@ public class NetworkManager : MonoBehaviour
     {
         UpdateScoreRequestData myData = new UpdateScoreRequestData();
         myData.Name = initials;
+        myData.Score = level;
         string DataAsJSON = JsonUtility.ToJson(myData);
         byte[] bytes = Encoding.ASCII.GetBytes(DataAsJSON);
-
-        working here ****
 
         UnityWebRequest req = new UnityWebRequest(uri);
         UploadHandlerRaw uH = new UploadHandlerRaw(bytes);
         req.uploadHandler = uH;
         req.SetRequestHeader("Content-Type", "application/json");
-        req.SetRequestHeader("Token", string (sessionToke));
+        req.SetRequestHeader("Token", sessionToke.ToString());
         req.method = UnityWebRequest.kHttpVerbPOST;
 
         DownloadHandlerBuffer dH = new DownloadHandlerBuffer();
@@ -143,8 +142,8 @@ public class NetworkManager : MonoBehaviour
         else
         {
             Debug.Log("PUS Respnonse Received: " + req.downloadHandler.text);
-            UpdateScoreRequestData myJSON = JsonUtility.FromJson<UpdateScoreRequestData>(req.downloadHandler.text);
-            Debug.Log("PUS Name = \"" + myJSON.Name + "\" " + "Score = " + myJSON.Score);
+ //           UpdateScoreResponseData myJSON = JsonUtility.FromJson<UpdateScoreResponseData>(req.downloadHandler.text);
+//            Debug.Log("PUS Score message: \"" + myJSON.ScoreStatus);
         }
     }
 
