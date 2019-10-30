@@ -55,6 +55,7 @@ public class NetworkManager : MonoBehaviour
             Debug.Log("GRR Success: Response Received");
             PlayerInitResponseData myJSON = JsonUtility.FromJson<PlayerInitResponseData>(req.downloadHandler.text);
             Debug.Log(myJSON.RandVal);
+            UnityEngine.Random.InitState(myJSON.RandVal);
             callback();
         }
     }

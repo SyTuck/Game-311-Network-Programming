@@ -58,7 +58,7 @@ namespace Completed
 
             StartCoroutine(NetworkManager.Instance.GetRandomRequest(GETRANDOMURI, InitGame));
 
-            Random.InitState(1);
+            //Random.InitState(1);
             //Call the InitGame function to initialize the first level 
 			//InitGame();
 		}
