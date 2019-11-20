@@ -116,6 +116,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="EatingController.cpp" />
+    <ClCompile Include="EatingRequest.cpp" />
+    <ClCompile Include="EatingResponse.cpp" />
     <ClCompile Include="GetRequestView.cpp" />
     <ClCompile Include="LoginController.cpp" />
     <ClCompile Include="LoginRequest.cpp" />
@@ -128,6 +131,10 @@
     <ClCompile Include="SessionManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EatingController.h" />
+    <ClInclude Include="EatingModel.h" />
+    <ClInclude Include="EatingRequest.h" />
+    <ClInclude Include="EatingResponse.h" />
     <ClInclude Include="GetRequestView.h" />
     <ClInclude Include="LoginController.h" />
     <ClInclude Include="LoginModel.h" />
@@ -138,7 +145,11 @@
     <ClInclude Include="PlayerDiedRequest.h" />
     <ClInclude Include="PlayerDiedResponse.h" />
     <ClInclude Include="PostRequestView.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SessionManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="server.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

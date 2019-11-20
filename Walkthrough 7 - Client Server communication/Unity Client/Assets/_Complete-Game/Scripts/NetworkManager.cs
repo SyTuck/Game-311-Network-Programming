@@ -30,12 +30,16 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    public IEnumerator MakeGetRequest(string uri)
+    public IEnumerator MakeGetRequest(string uri, string user = "")
     {
 
         Debug.Log("Get Request: " + uri);
         UnityWebRequest req = new UnityWebRequest(uri);
         req.SetRequestHeader("UserID", "1");
+        if (user != "")
+        {
+            req.SetRequestHeader("UserName", user);
+        }
 
         DownloadHandlerBuffer dH = new DownloadHandlerBuffer();
         req.downloadHandler = dH;

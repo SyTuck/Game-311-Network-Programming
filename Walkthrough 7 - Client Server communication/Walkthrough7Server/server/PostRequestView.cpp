@@ -13,6 +13,11 @@ void handle_post(http_request request)
 		LoginController Controller;
 		Controller.Process(request);
 	}
+	else if ((wcscmp(APIPath.c_str(), L"/SLCGame311/FoodEaten") == 0))
+	{
+		EatingController eController;
+		eController.Process(request);
+	}
 	else
 	{
 		request.reply(status_codes::BadRequest, "error 404 API not found");

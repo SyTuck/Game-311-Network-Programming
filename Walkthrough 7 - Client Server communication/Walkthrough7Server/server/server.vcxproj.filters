@@ -78,6 +78,15 @@
     <ClCompile Include="PostRequestView.cpp">
       <Filter>Source Files\View</Filter>
     </ClCompile>
+    <ClCompile Include="EatingController.cpp">
+      <Filter>Source Files\Controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="EatingRequest.cpp">
+      <Filter>Source Files\View\Requests\POST</Filter>
+    </ClCompile>
+    <ClCompile Include="EatingResponse.cpp">
+      <Filter>Source Files\View\Responses\POST</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PlayerDiedRequest.h">
@@ -113,5 +122,25 @@
     <ClInclude Include="PostRequestView.h">
       <Filter>Source Files\View</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EatingModel.h">
+      <Filter>Source Files\Models\POST</Filter>
+    </ClInclude>
+    <ClInclude Include="EatingController.h">
+      <Filter>Source Files\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="EatingRequest.h">
+      <Filter>Source Files\View\Requests\POST</Filter>
+    </ClInclude>
+    <ClInclude Include="EatingResponse.h">
+      <Filter>Source Files\View\Responses\POST</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="server.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

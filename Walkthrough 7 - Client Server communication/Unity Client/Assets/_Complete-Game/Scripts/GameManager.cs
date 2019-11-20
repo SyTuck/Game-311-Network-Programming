@@ -25,6 +25,7 @@ namespace Completed
 		private bool doingSetup = true;                         //Boolean to check if we're setting up board, prevent Player from moving during setup.
 
         private string initials = " JVT";
+        public string GetInitials() { return initials; }
 		
 		//Awake is always called before any Start functions
 		void Awake()
@@ -141,7 +142,7 @@ namespace Completed
             //Set levelText to display number of levels passed and game over message
             //levelText.text = "After " + level + " days, you starved.";
             levelText.text = "After " + level + " days," + initials + " starved.";
-            StartCoroutine(NetworkManager.Instance.MakeGetRequest("http://localhost:8777/SLCGame311/PlayerDied"));
+            StartCoroutine(NetworkManager.Instance.MakeGetRequest("http://localhost:8777/SLCGame311/PlayerDied", initials));
             //Enable black background image gameObject.
             levelImage.SetActive(true);
 			
