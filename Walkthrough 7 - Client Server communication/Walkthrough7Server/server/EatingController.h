@@ -13,9 +13,14 @@ using namespace web::http;
 class EatingController
 {
 public:
-	EatingController();
+	EatingController() {// totalFood.appleValue = 10;
+						}// totalFood.popValue   = 20; }
+
 	~EatingController();
 
 	void Process(http_request request);
+
+private: 
+	//static EatingModel totalFood;
 };
 

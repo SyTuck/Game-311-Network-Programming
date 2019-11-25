@@ -1,11 +1,10 @@
 #include "EatingController.h"
 
 
-
-EatingController::EatingController()
-{
-}
-
+int appleCount = 0;
+int appleValue = 10;
+int popCount = 0;
+int popValue = 20;
 
 EatingController::~EatingController()
 {
@@ -27,33 +26,37 @@ void EatingController::Process(http_request request)
 	success = eatingReq.ProcessRequest(request, eatingModel);
 	if (!success)
 	{
-		request.reply(status_codes::BadRequest, "Error, Unable to Process the Request");
+		request.reply(status_codes::BadRequest, "Error, missing items in request");
 	}
 
-	// Complete Any Logic Here
-//	bool newUser = !SessionManager::GetInstance()->SessionExists(loginModel.Name);
-
-//	loginModel.ResponseStr = loginModel.Name;
-//	loginModel.SessionToken = -1;
-
-//	if (newUser == false)
-//	{
-//		loginModel.ResponseStr.append(L" Welcome back");
-//		loginModel.SessionToken = SessionManager::GetInstance()->GetSession(loginModel.Name);
-//	}
-//	else
-//	{
-//		loginModel.SessionToken = SessionManager::GetInstance()->CreateSession(loginModel.Name);
-//		loginModel.ResponseStr.append(L" Welcome to the server. Since this is your first time, please see your authentication token attached.");
-//	}
-
-	// Process and send the response
-	EatingResponse Response;
-	success = Response.ProcessResponse(eatingModel);
-	if (!success)
+	if (success)
 	{
-		request.reply(status_codes::BadRequest, "Error, Unable to Process Response Data");
-	}
+		appleCount += eatingModel.appleCount;
+		popCount += eatingModel.popCount;
 
-	Response.SendResponse(request);
+		if (appleCount > popCount)
+		{
+			appleValue -= 1;
+			popValue += 1;
+			eatingModel.textReply.assign(L"Your too skinny. Drink more pop.");
+		}
+		else if (appleCount < popCount)
+		{
+			appleValue += 1;
+			popValue -= 1;
+			eatingModel.textReply.assign(L"Your getting fat. Eat more apples.");
+		}
+
+		eatingModel.appleValue = appleValue;
+		eatingModel.popValue = popValue;
+
+		EatingResponse Response;
+		success = Response.ProcessResponse(eatingModel);
+		if (!success)
+		{
+			request.reply(status_codes::BadRequest, "Error, Unable to Process Response Data");
+		}
+
+		Response.SendResponse(request);
+	}
 }

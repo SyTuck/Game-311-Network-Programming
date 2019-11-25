@@ -15,7 +15,7 @@ bool EatingRequest::ValidateHeaders(http_request request)
 {
 	bool success = true;
 
-	if (!(request.headers().has(L"X-Eats") & request.headers().has(L"X-Food")))
+	if (!(request.headers().has(L"X-Eats")))
 	{
 		success = false;
 	}
@@ -38,11 +38,12 @@ bool EatingRequest::ProcessRequest(http_request request, EatingModel &eatingMode
 		requestJSONData = task.get();
 	}).wait();
 
-	if (requestJSONData.has_string_field(U("PlayerName")))
+	if (requestJSONData.has_integer_field(U("appleCount")) && requestJSONData.has_integer_field(U("popCount")))
 	{
-		utility::string_t Name = requestJSONData.at(U("PlayerName")).as_string();
-		wstring initials = Name;
-		eatingModel.Name = Name;
+		json::number cnt = requestJSONData.at(U("appleCount")).as_number();
+		eatingModel.appleCount = cnt.to_int32();
+		cnt = requestJSONData.at(U("popCount")).as_number();
+		eatingModel.popCount = cnt.to_int32();
 	}
 	else
 	{

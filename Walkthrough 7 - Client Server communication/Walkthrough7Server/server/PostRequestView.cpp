@@ -1,5 +1,6 @@
 #include "PostRequestView.h"
 #include "LoginController.h"
+#include "EatingController.h"
 #include "SessionManager.h"
 
 void handle_post(http_request request)

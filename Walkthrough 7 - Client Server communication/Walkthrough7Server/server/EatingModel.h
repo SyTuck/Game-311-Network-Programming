@@ -4,9 +4,14 @@ using namespace std;
 
 struct EatingModel
 {
-	wstring Name;
-
+	//request fields
 	int appleCount;
 	int popCount;
+
+	//reply fields
+	int appleValue;
+	int popValue;
+
+	wstring textReply;
 
 };
