@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Assets._Complete_Game.Scripts.Requests
 {
     [Serializable]
-    class FoodEatenRequestsData
+    public class FoodEatenRequestsData
     {
         public int appleCount;
         public int popCount;

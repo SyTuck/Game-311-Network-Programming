@@ -12,7 +12,14 @@ using Assets._Complete_Game.Scripts.Requests;
 public class NetworkManager : MonoBehaviour
 {
     public static NetworkManager _instance = null;
-    
+
+    public bool updated;
+    public float value1;
+    public float value2;
+    public string message1;
+
+
+
     public static NetworkManager Instance
     {
         get
@@ -32,7 +39,6 @@ public class NetworkManager : MonoBehaviour
 
     public IEnumerator MakeGetRequest(string uri, string user = "")
     {
-
         Debug.Log("Get Request: " + uri);
         UnityWebRequest req = new UnityWebRequest(uri);
         req.SetRequestHeader("UserID", "1");
@@ -86,11 +92,12 @@ public class NetworkManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Respnonse Received: " + req.downloadHandler.text);
+            Debug.Log("Response Received: " + req.downloadHandler.text);
         }
     }
-    public IEnumerator PostRequestHealth(string uri, int apples, int sodas, FoodEatenResponseData myJSON)
+    public IEnumerator PostRequestHealth(string uri, int apples, int sodas)
     {
+        updated = false;
         Debug.Log("Post Request: " + uri);
         FoodEatenRequestsData myData = new FoodEatenRequestsData();
         myData.appleCount = apples;
@@ -117,12 +124,12 @@ public class NetworkManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Respnonse Received: " + req.downloadHandler.text);
-            FoodEatenResponseData myJSON = JsonUtility.FromJson<FoodEatenResponseData>(req.downloadHandler.text);
-
-            GameObject.Find("Player").GetComponent<Player>().foodValue = myJSON.appleValue;
-            GameObject.Find("Player").GetComponent<Player>().sodaValue = myJSON.popValue;
-
+            Debug.Log("Response Received: " + req.downloadHandler.text);
+            FoodEatenResponseData myDiet = JsonUtility.FromJson<FoodEatenResponseData>(req.downloadHandler.text);
+            value1 = myDiet.appleValue;
+            value2 = myDiet.popValue;
+            message1 = myDiet.healthMessage;
+            // GameObject.Find("Player").GetComponent<Player>().pointsPerFood = value1;
         }
     }
 

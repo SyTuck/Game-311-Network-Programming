@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 namespace Assets._Complete_Game.Scripts.Responses
 {
     [Serializable]
-    class FoodEatenResponseData
+    public class FoodEatenResponseData
     {
+        public bool updated;
         public int appleValue;
         public int popValue;
         public string healthMessage;

@@ -2,6 +2,8 @@
 using UnityEngine.SceneManagement;
 using System.Collections;
 
+using Assets._Complete_Game.Scripts.Responses;
+
 namespace Completed
 {
 	using System.Collections.Generic;		//Allows us to use Lists. 
@@ -13,10 +15,12 @@ namespace Completed
 		public float turnDelay = 0.1f;							//Delay between each Player turn.
 		public int playerFoodPoints = 100;						//Starting value for Player food points.
 		public static GameManager instance = null;				//Static instance of GameManager which allows it to be accessed by any other script.
-		[HideInInspector] public bool playersTurn = true;		//Boolean to check if it's players turn, hidden in inspector but public.
-		
-		
-		private Text levelText;									//Text to display current level number.
+		[HideInInspector] public bool playersTurn = true;       //Boolean to check if it's players turn, hidden in inspector but public.
+
+        [HideInInspector] public FoodEatenResponseData playerDiet;
+
+        private Text levelText;									//Text to display current level number.
+        private Text foodMess;
 		private GameObject levelImage;							//Image to block out level as levels are being set up, background for levelText.
 		private BoardManager boardScript;						//Store a reference to our BoardManager which will set up the level.
 		private int level = 1;									//Current level number, expressed in game as "Day 1".
@@ -85,31 +89,58 @@ namespace Completed
 			//While doingSetup is true the player can't move, prevent player from moving while title card is up.
 			doingSetup = true;
 
-StartCoroutine(NetworkManager.Instance.PostRequestHealth (foodEatenURI,
-                                                          GameObject.Find("Player").GetComponent<Player>().foodEaten,
-                                                          GameObject.Find("Player").GetComponent<Player>().sodasDrank));
+            StartCoroutine(NetworkManager.Instance.PostRequestHealth (foodEatenURI,
+                                                                      GameObject.Find("Player").GetComponent<Player>().foodEaten,
+                                                                      GameObject.Find("Player").GetComponent<Player>().sodasDrank));
 
             //Get a reference to our image LevelImage by finding it by name.
             levelImage = GameObject.Find("LevelImage");
 			
 			//Get a reference to our text LevelText's text component by finding it by name and calling GetComponent.
 			levelText = GameObject.Find("LevelText").GetComponent<Text>();
-			
-			//Set the text of levelText to the string "Day" and append the current level number.
-			levelText.text = "Day " + level;
-			
-			//Set levelImage to active blocking player's view of the game board during setup.
-			levelImage.SetActive(true);
-			
-			//Call the HideLevelImage function with a delay in seconds of levelStartDelay.
-			Invoke("HideLevelImage", levelStartDelay);
+			foodMess = GameObject.Find("FoodMessage").GetComponent<Text>();
+            //Set the text of levelText to the string "Day" and append the current level number.
+            levelText.text = "Day " + level;
+            foodMess.text = "";
+/*
+            bool waiting = true;
+            float st = Time.realtimeSinceStartup + 2.0f;
+            Debug.Log("Waiting: " + Time.realtimeSinceStartup);
+            do
+            {
+                if (NetworkManager.Instance.updated)
+                {
+                    GameObject.Find("Player").GetComponent<Player>().pointsPerFood = (int) NetworkManager.Instance.value1;
+                    GameObject.Find("Player").GetComponent<Player>().pointsPerSoda = (int) NetworkManager.Instance.value2;
+                    foodMess.text = (string) NetworkManager.Instance.message1;
+                    waiting = false;
+                }
+                else
+                {
+                    waiting = (st > Time.realtimeSinceStartup);
+                }
+            }
+            while (waiting);
+
+            if (!NetworkManager.Instance.updated)
+            {
+                foodMess.text = "You missed your check-up!";
+            }
+            Debug.Log("Waiting: " + Time.realtimeSinceStartup);
+*/
+            //Set levelImage to active blocking player's view of the game board during setup.
+            levelImage.SetActive(true);
+
+            //Call the HideLevelImage function with a delay in seconds of levelStartDelay.
+            Invoke("HideLevelImage", 5.0f);// levelStartDelay);
 			
 			//Clear any Enemy objects in our List to prepare for next level.
 			enemies.Clear();
 			
 			//Call the SetupScene function of the BoardManager script, pass it current level number.
 			boardScript.SetupScene(level);
-			
+
+
 		}
 		
 		
