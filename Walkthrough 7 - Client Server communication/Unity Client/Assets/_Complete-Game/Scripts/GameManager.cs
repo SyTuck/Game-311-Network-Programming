@@ -26,9 +26,13 @@ namespace Completed
 
         private string initials = " JVT";
         public string GetInitials() { return initials; }
-		
-		//Awake is always called before any Start functions
-		void Awake()
+
+        private string loginURI = "http://localhost:8777/SLCGame311/Login";
+        private string playerDiedURI = "http://localhost:8777/SLCGame311/PlayerDied";
+        private string foodEatenURI = "http://localhost:8777/SLCGame311/FoodEaten";
+
+        //Awake is always called before any Start functions
+        void Awake()
 		{
             //Check if instance already exists
             if (instance == null)
@@ -45,7 +49,7 @@ namespace Completed
 			//Sets this to not be destroyed when reloading scene
 			DontDestroyOnLoad(gameObject);
 
-            StartCoroutine(NetworkManager.Instance.PostRequestExample("http://localhost:8777/SLCGame311/Login", initials));
+            StartCoroutine(NetworkManager.Instance.PostRequestExample(loginURI, initials));
 
 			//Assign enemies to a new List of Enemy objects.
 			enemies = new List<Enemy>();
@@ -80,9 +84,13 @@ namespace Completed
 		{
 			//While doingSetup is true the player can't move, prevent player from moving while title card is up.
 			doingSetup = true;
-			
-			//Get a reference to our image LevelImage by finding it by name.
-			levelImage = GameObject.Find("LevelImage");
+
+StartCoroutine(NetworkManager.Instance.PostRequestHealth (foodEatenURI,
+                                                          GameObject.Find("Player").GetComponent<Player>().foodEaten,
+                                                          GameObject.Find("Player").GetComponent<Player>().sodasDrank));
+
+            //Get a reference to our image LevelImage by finding it by name.
+            levelImage = GameObject.Find("LevelImage");
 			
 			//Get a reference to our text LevelText's text component by finding it by name and calling GetComponent.
 			levelText = GameObject.Find("LevelText").GetComponent<Text>();
@@ -142,7 +150,7 @@ namespace Completed
             //Set levelText to display number of levels passed and game over message
             //levelText.text = "After " + level + " days, you starved.";
             levelText.text = "After " + level + " days," + initials + " starved.";
-            StartCoroutine(NetworkManager.Instance.MakeGetRequest("http://localhost:8777/SLCGame311/PlayerDied", initials));
+            StartCoroutine(NetworkManager.Instance.MakeGetRequest(playerDiedURI, initials));
             //Enable black background image gameObject.
             levelImage.SetActive(true);
 			

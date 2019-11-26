@@ -20,6 +20,9 @@ namespace Completed
 		public AudioClip drinkSound1;				//1 of 2 Audio clips to play when player collects a soda object.
 		public AudioClip drinkSound2;				//2 of 2 Audio clips to play when player collects a soda object.
 		public AudioClip gameOverSound;				//Audio clip to play when player dies.
+
+        [HideInInspector] public int foodEaten = 0;
+        [HideInInspector] public int sodasDrank = 0;
 		
 		private Animator animator;					//Used to store a reference to the Player's animator component.
 		private int food;                           //Used to store player food points total during level.
@@ -199,6 +202,8 @@ namespace Completed
 				
 				//Disable the food object the player collided with.
 				other.gameObject.SetActive (false);
+
+                foodEaten++;
 			}
 			
 			//Check if the tag of the trigger collided with is Soda.
@@ -215,6 +220,8 @@ namespace Completed
 				
 				//Disable the soda object the player collided with.
 				other.gameObject.SetActive (false);
+
+                sodasDrank++;
 			}
 		}
 		

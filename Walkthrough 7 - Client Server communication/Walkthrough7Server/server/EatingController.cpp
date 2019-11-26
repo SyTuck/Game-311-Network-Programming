@@ -38,13 +38,24 @@ void EatingController::Process(http_request request)
 		{
 			appleValue -= 1;
 			popValue += 1;
-			eatingModel.textReply.assign(L"Your too skinny. Drink more pop.");
 		}
 		else if (appleCount < popCount)
 		{
 			appleValue += 1;
 			popValue -= 1;
+		}
+
+		if (appleValue > popValue)
+		{
+			eatingModel.textReply.assign(L"Your too skinny. Drink more pop.");
+		}
+		else if (popValue > appleValue)
+		{
 			eatingModel.textReply.assign(L"Your getting fat. Eat more apples.");
+		}
+		else
+		{
+			eatingModel.textReply.assign(L"You are in good health.");
 		}
 
 		eatingModel.appleValue = appleValue;

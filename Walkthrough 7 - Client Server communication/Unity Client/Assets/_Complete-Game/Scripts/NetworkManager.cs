@@ -54,9 +54,8 @@ public class NetworkManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Success: Response Received");
+            Debug.Log("Success: Response Received" + req.downloadHandler.text);
             PlayerDiedResponseData myJSON = JsonUtility.FromJson<PlayerDiedResponseData>(req.downloadHandler.text);
-            Debug.Log(myJSON.UserID);
         }
     }
 
@@ -88,6 +87,42 @@ public class NetworkManager : MonoBehaviour
         else
         {
             Debug.Log("Respnonse Received: " + req.downloadHandler.text);
+        }
+    }
+    public IEnumerator PostRequestHealth(string uri, int apples, int sodas, FoodEatenResponseData myJSON)
+    {
+        Debug.Log("Post Request: " + uri);
+        FoodEatenRequestsData myData = new FoodEatenRequestsData();
+        myData.appleCount = apples;
+        myData.popCount = sodas;
+        string DataAsJSON = JsonUtility.ToJson(myData);
+        byte[] bytes = Encoding.ASCII.GetBytes(DataAsJSON);
+
+        UnityWebRequest req = new UnityWebRequest(uri);
+        UploadHandlerRaw uH = new UploadHandlerRaw(bytes);
+        req.uploadHandler = uH;
+        req.SetRequestHeader("Content-Type", "application/json");
+        req.SetRequestHeader("X-Eats", "Food");
+        req.method = UnityWebRequest.kHttpVerbPOST;
+
+        DownloadHandlerBuffer dH = new DownloadHandlerBuffer();
+        req.downloadHandler = dH;
+
+        yield return req.SendWebRequest();
+        Debug.Log("Response Code: " + req.responseCode);
+
+        if (req.isNetworkError)
+        {
+            Debug.LogWarning("Error: " + req.error);
+        }
+        else
+        {
+            Debug.Log("Respnonse Received: " + req.downloadHandler.text);
+            FoodEatenResponseData myJSON = JsonUtility.FromJson<FoodEatenResponseData>(req.downloadHandler.text);
+
+            GameObject.Find("Player").GetComponent<Player>().foodValue = myJSON.appleValue;
+            GameObject.Find("Player").GetComponent<Player>().sodaValue = myJSON.popValue;
+
         }
     }
 
