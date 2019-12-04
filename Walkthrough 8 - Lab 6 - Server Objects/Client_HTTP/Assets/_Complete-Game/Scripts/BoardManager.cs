@@ -128,16 +128,19 @@ namespace Completed
 			}
 		}
 		
+
+        public void InitScene()
+        {
+            //Creates the outer walls and floor.
+            BoardSetup();
+
+            //Reset our list of gridpositions.
+            InitialiseList();
+        }
 		
 		//SetupScene initializes our level and calls the previous functions to lay out the game board
 		public void SetupScene (int level)
 		{
-			//Creates the outer walls and floor.
-			BoardSetup ();
-			
-			//Reset our list of gridpositions.
-			InitialiseList ();
-			
 			//Instantiate a random number of wall tiles based on minimum and maximum, at randomized positions.
 			LayoutObjectAtRandom (wallTiles, wallCount.minimum, wallCount.maximum);
 			

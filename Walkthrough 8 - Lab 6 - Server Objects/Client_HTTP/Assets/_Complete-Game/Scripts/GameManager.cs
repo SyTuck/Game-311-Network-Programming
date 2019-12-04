@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using UnityEngine.Networking;
 
 namespace Completed
 {
@@ -94,9 +95,10 @@ namespace Completed
 			
 			//Clear any Enemy objects in our List to prepare for next level.
 			enemies.Clear();
-			
-			//Call the SetupScene function of the BoardManager script, pass it current level number.
-			boardScript.SetupScene(level);
+
+            //Call the SetupScene function of the BoardManager script, pass it current level number.
+            boardScript.InitScene();
+			//boardScript.SetupScene(level);
 			
 		}
 		
@@ -108,17 +110,27 @@ namespace Completed
 			levelImage.SetActive(false);
 			
 			//Set doingSetup to false allowing player to move again.
-			doingSetup = false;
+			//doingSetup = false;
 		}
 		
 		//Update is called every frame.
 		void Update()
 		{
-			//Check that playersTurn or enemiesMoving or doingSetup are not currently true.
-			if(playersTurn || enemiesMoving || doingSetup)
+
+            if (doingSetup)
+            {
+                int id = (int)gameObject.GetComponent<NetworkIdentity>().netId.Value;
+                if (id == 1)
+                {
+                    boardScript.SetupScene(level);
+                    doingSetup = false;
+                }
+            }
+            //Check that playersTurn or enemiesMoving or doingSetup are not currently true.
+            if (playersTurn || enemiesMoving || doingSetup)
 				
-				//If any of these are true, return and do not start MoveEnemies.
-				return;
+            //If any of these are true, return and do not start MoveEnemies.
+            return;
 			
 			//Start moving enemies.
 			StartCoroutine (MoveEnemies ());
