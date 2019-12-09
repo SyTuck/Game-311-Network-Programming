@@ -51,6 +51,11 @@ namespace Completed
 			
 			//Call the Start function of the MovingObject base class.
 			base.Start ();
+
+            if (isServer)
+            {
+                GameManager.instance.BuildScene();
+            }
 		}
 		
 		
