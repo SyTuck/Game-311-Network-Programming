@@ -124,10 +124,16 @@ namespace Completed
 
                 //Instantiate tileChoice at the position returned by RandomPosition with no change in rotation
                 randomPosition.x -= 4.0f;
-				Instantiate(tileChoice, randomPosition, Quaternion.identity);
-			}
+                //Instantiate(tileChoice, randomPosition, Quaternion.identity);
+                CreateObjectAtSpot(tileChoice, randomPosition, Quaternion.identity);
+            }
 		}
-		
+
+        public void CreateObjectAtSpot(GameObject obj, Vector3 pos, Quaternion rot)
+        {
+            Instantiate(obj, pos, rot);
+        }
+
 
         public void InitScene()
         {

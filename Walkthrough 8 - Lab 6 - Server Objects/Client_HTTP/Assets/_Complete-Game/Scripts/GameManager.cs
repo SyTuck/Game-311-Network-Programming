@@ -116,18 +116,6 @@ namespace Completed
         //Update is called every frame.
         void Update()
         {
-
-            /*         if (doingSetup)
-                     {
-                         int id = (int) gameObject.GetComponent<NetworkIdentity>().netId.Value;
-                         //                if (id == 1)
-                         bool serv = NetworkManager.Instance. gameObject.GetComponent<>().isServer;
-                         if (serv)
-                         {
-                             boardScript.SetupScene(level);
-                             doingSetup = false;
-                         }
-                     }*/
             //Check that playersTurn or enemiesMoving or doingSetup are not currently true.
             if (playersTurn || enemiesMoving || doingSetup)
 

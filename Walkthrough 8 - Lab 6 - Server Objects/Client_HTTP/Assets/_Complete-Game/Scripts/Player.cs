@@ -54,6 +54,7 @@ namespace Completed
 
             if (isServer)
             {
+                Random.seed = Enviroment.TickCount & int16.MaxValue;
                 GameManager.instance.BuildScene();
             }
 		}
@@ -286,6 +287,15 @@ namespace Completed
 				GameManager.instance.GameOver ();
 			}
 		}
-	}
+
+/*        [ClientRpc]
+        void RpcUpDateTile(int arrayID, int arrayIDX, int x, int y)
+        {
+            switch (arrayID)
+            {
+
+            }
+        }*/
+    }
 }
 
