@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;	//Allows us to use UI.
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
@@ -23,7 +25,10 @@ namespace Completed
 		public AudioClip gameOverSound;				//Audio clip to play when player dies.
 		
 		private Animator animator;					//Used to store a reference to the Player's animator component.
-		private int food;                           //Used to store player food points total during level.
+		[SyncVar] private int food;                 //Used to store player food points total during level.
+
+        private static bool levelBuilt = false;
+
 #if UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
         private Vector2 touchOrigin = -Vector2.one;	//Used to store location of screen touch origin for mobile controls.
 #endif
@@ -45,6 +50,7 @@ namespace Completed
             Vector3 startPos = new Vector3(-4.0f, 7.0f, 0.0f);
             if (id > 1)
             {
+                Debug.Log("Player: " + id + " spawned");
                 startPos = new Vector3(11.0f, 0.0f, 0.0f);
             }
             this.gameObject.transform.position = startPos;
@@ -52,12 +58,27 @@ namespace Completed
 			//Call the Start function of the MovingObject base class.
 			base.Start ();
 
-            if (isServer)
+            if (isServer & (!levelBuilt))
             {
-                Random.seed = Enviroment.TickCount & int16.MaxValue;
+                Debug.Log("Spawning Stuff");
                 GameManager.instance.BuildScene();
+
+                List<GameObject> stuff = new List<GameObject>();
+
+                stuff.AddRange(GameObject.FindGameObjectsWithTag("Food"));
+                stuff.AddRange(GameObject.FindGameObjectsWithTag("Soda"));
+                stuff.AddRange(GameObject.FindGameObjectsWithTag("Wall"));
+
+                if (stuff.Count > 0)
+                {
+                    foreach (GameObject go in stuff)
+                    {
+                        NetworkServer.Spawn(go);
+                    }
+                }
+                levelBuilt = true;
             }
-		}
+        }
 		
 		
 		//This function is called when the behaviour becomes disabled or inactive.
