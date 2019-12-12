@@ -29,6 +29,8 @@ namespace Completed
 
         private static bool levelBuilt = false;
 
+        private int lastSecond;
+
 #if UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
         private Vector2 touchOrigin = -Vector2.one;	//Used to store location of screen touch origin for mobile controls.
 #endif
@@ -92,10 +94,20 @@ namespace Completed
 		private void Update ()
 		{
 
-            if (!isLocalPlayer) return;
+          if (!isLocalPlayer) return;
 
 			//If it's not the player's turn, exit the function.
-			if(!GameManager.instance.playersTurn) return;
+//			if(!GameManager.instance.playersTurn) return;
+
+            if (lastSecond != (int) Time.time)
+            {
+                lastSecond = (int) Time.time;
+
+            }
+            else
+            {
+                return;
+            }
 			
 			int horizontal = 0;  	//Used to store the horizontal move direction.
 			int vertical = 0;		//Used to store the vertical move direction.
@@ -113,7 +125,12 @@ namespace Completed
 			if(horizontal != 0)
 			{
 				vertical = 0;
+                Debug.Log("Horizontal Move: " + horizontal);
 			}
+            else if (vertical != 0)
+            {
+                Debug.Log("Vertical Move " + vertical);
+            }
 			//Check if we are running on iOS, Android, Windows Phone 8 or Unity iPhone
 #elif UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
 			

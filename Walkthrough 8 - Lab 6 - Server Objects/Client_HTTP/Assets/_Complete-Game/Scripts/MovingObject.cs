@@ -57,9 +57,9 @@ namespace Completed
 				//Return true to say that Move was successful
 				return true;
 			}
-			
-			//If something was hit, return false, Move was unsuccesful.
-			return false;
+
+            //If something was hit, return false, Move was unsuccesful.
+            return false;
 		}
 
 
@@ -112,9 +112,9 @@ namespace Completed
 			
 			//Get a component reference to the component of type T attached to the object that was hit
 			T hitComponent = hit.transform.GetComponent <T> ();
-			
-			//If canMove is false and hitComponent is not equal to null, meaning MovingObject is blocked and has hit something it can interact with.
-			if(!canMove && hitComponent != null)
+
+            //If canMove is false and hitComponent is not equal to null, meaning MovingObject is blocked and has hit something it can interact with.
+           if (!canMove && hitComponent != null)
 				
 				//Call the OnCantMove function and pass it hitComponent as a parameter.
 				OnCantMove (hitComponent);
